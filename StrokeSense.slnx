@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="StrokeSense.Api/StrokeSense.Api.csproj" />
+  <Project Path="StrokeSense.Contracts/StrokeSense.Contracts.csproj" />
+  <Project Path="StrokeSense.UI/StrokeSense.UI.csproj" />
+</Solution>
