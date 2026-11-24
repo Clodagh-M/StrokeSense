@@ -1,0 +1,26 @@
+﻿@using StrokeSense.Contracts
+
+<div class="disclaimer-container">
+    <h2>Important</h2>
+    <p class="disclaimer-text">
+        This tool is <strong>NOT a diagnosis</strong>. It provides a risk indicator only.
+        If you or someone else has stroke symptoms (Face, Arms, Speech, Time),
+        call <strong>999/112 immediately</strong>.
+    </p>
+    <p>
+        Your audio is processed in your browser and is <strong>not stored</strong>.
+    </p>
+    <button class="btn-primary" @onclick="Acknowledge">
+        I understand – continue
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnAcknowledged { get; set; }
+
+    private async Task Acknowledge()
+    {
+        await OnAcknowledged.InvokeAsync();
+    }
+}
