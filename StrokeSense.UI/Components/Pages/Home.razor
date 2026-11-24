@@ -1,7 +1,43 @@
 ﻿@page "/"
+@using StrokeSense.Contracts
+@inject IRiskClassifier Classifier
 
-<PageTitle>Home</PageTitle>
+<PageTitle>StrokeSense</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (currentStep == "disclaimer")
+{
+    <DisclaimerGate OnAcknowledged="AcknowledgeDisclaimer" />
+}
+else if (currentStep == "recording")
+{
+    <RecordingStep OnSubmitted="HandleSubmitted" />
+}
+else if (currentStep == "result")
+{
+    <ResultCard Result="result" OnNewTest="ResetToDisclaimer" />
+}
 
-Welcome to your new app.
+@code {
+    private string currentStep = "disclaimer";
+    private RiskResultDto? result;
+
+    private void AcknowledgeDisclaimer()
+    {
+        currentStep = "recording";
+    }
+
+    private async Task HandleSubmitted()
+    {
+        // For Sprint 1, call stub classifier with empty stream
+        // In Sprint 4, this will receive the actual audio blob
+        using var emptyStream = new MemoryStream();
+        result = await Classifier.ClassifyAsync(emptyStream);
+        currentStep = "result";
+    }
+
+    private void ResetToDisclaimer()
+    {
+        currentStep = "disclaimer";
+        result = null;
+    }
+}

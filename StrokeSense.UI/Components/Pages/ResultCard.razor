@@ -1,0 +1,74 @@
+﻿@using StrokeSense.Contracts
+
+<div class="result-container">
+    <h2>Your Result</h2>
+
+    <div class="risk-indicator @RiskLabelClass">
+        <span class="risk-icon">@RiskIcon</span>
+        <span class="risk-label">@RiskLabel.ToUpper() RISK INDICATOR</span>
+    </div>
+
+    <p class="risk-description">
+        @if (RiskLabel == "elevated")
+        {
+            <text>
+                Your speech sample shows patterns that may warrant medical attention.
+                <strong>If you have any stroke symptoms, call 999/112 immediately.</strong>
+            </text>
+        }
+        else
+        {
+            <text>
+                Your speech sample does not show strong patterns associated with
+                stroke-related speech changes.
+            </text>
+        }
+    </p>
+
+    <p class="confidence">
+        Confidence: @ConfidenceText
+    </p>
+
+    <p class="disclaimer-small">
+        This is not a diagnosis.
+    </p>
+
+    <button class="btn-primary" @onclick="StartNewTest">Start a new test</button>
+</div>
+
+@code {
+    [Parameter]
+    public RiskResultDto? Result { get; set; }
+
+    [Parameter]
+    public EventCallback OnNewTest { get; set; }
+
+    private string RiskLabel => Result?.Label ?? "low";
+    private double Confidence => Result?.Confidence ?? 0;
+
+    private string RiskLabelClass => RiskLabel switch
+    {
+        "elevated" => "risk-elevated",
+        "moderate" => "risk-moderate",
+        _ => "risk-low"
+    };
+
+    private string RiskIcon => RiskLabel switch
+    {
+        "elevated" => "▲",
+        "moderate" => "●",
+        _ => "●"
+    };
+
+    private string ConfidenceText => Confidence switch
+    {
+        >= 0.8 => "High",
+        >= 0.5 => "Moderate",
+        _ => "Low"
+    };
+
+    private async Task StartNewTest()
+    {
+        await OnNewTest.InvokeAsync();
+    }
+}

@@ -30,3 +30,61 @@ body {
 .disclaimer-text {
     font-size: 18px;
 }
+
+.result-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.risk-indicator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.risk-low {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 2px solid #0f5132;
+}
+
+.risk-moderate {
+    background-color: #fff3cd;
+    color: #664d03;
+    border: 2px solid #664d03;
+}
+
+.risk-elevated {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 2px solid #842029;
+}
+
+.risk-icon {
+    font-size: 1.5rem;
+}
+
+.risk-label {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.risk-description {
+    font-size: 18px;
+    margin: 1.5rem 0;
+}
+
+.confidence {
+    font-size: 18px;
+    color: #495057;
+}
+
+.disclaimer-small {
+    font-size: 16px;
+    color: #6c757d;
+    font-style: italic;
+}

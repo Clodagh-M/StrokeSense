@@ -1,19 +1,28 @@
 ﻿@using StrokeSense.Contracts
 
-<div class="disclaimer-container">
-    <h2>Important</h2>
-    <p class="disclaimer-text">
-        This tool is <strong>NOT a diagnosis</strong>. It provides a risk indicator only.
-        If you or someone else has stroke symptoms (Face, Arms, Speech, Time),
-        call <strong>999/112 immediately</strong>.
-    </p>
-    <p>
-        Your audio is processed in your browser and is <strong>not stored</strong>.
-    </p>
-    <button class="btn-primary" @onclick="Acknowledge">
-        I understand – continue
-    </button>
-</div>
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-8">
+    <MudPaper Elevation="3" Class="pa-6" Style="border: 2px solid #dc3545;">
+        <MudText Typo="Typo.h4" Color="Color.Error" Gutters>Important</MudText>
+
+        <MudText Typo="Typo.body1" Class="mt-4">
+            This tool is <strong>NOT a diagnosis</strong>. It provides a risk indicator only.
+            If you or someone else has stroke symptoms (Face, Arms, Speech, Time),
+            call <strong>999/112 immediately</strong>.
+        </MudText>
+
+        <MudText Typo="Typo.body1" Class="mt-4">
+            Your audio is processed in your browser and is <strong>not stored</strong>.
+        </MudText>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   Class="mt-6"
+                   OnClick="Acknowledge">
+            I understand – continue
+        </MudButton>
+    </MudPaper>
+</MudContainer>
 
 @code {
     [Parameter]

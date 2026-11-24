@@ -1,0 +1,83 @@
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<div class="recording-container">
+    <h2>Step 1: Record Sustained Vowel</h2>
+    <p>Say "ahh" steadily for about 5 seconds.</p>
+
+    <button class="btn-primary" @onclick="ToggleRecording">
+        @(isRecording ? "Stop Recording" : "Start Recording")
+    </button>
+
+    @if (hasRecording)
+    {
+        <div class="playback-section">
+            <p>Recording captured.</p>
+            <button class="btn-secondary" @onclick="Playback">Playback</button>
+            <button class="btn-secondary" @onclick="Reset">Re-record</button>
+            <button class="btn-primary" @onclick="Submit">Submit for Analysis</button>
+        </div>
+    }
+
+    <p class="status">@statusMessage</p>
+</div>
+
+@code {
+    private bool isRecording = false;
+    private bool hasRecording = false;
+    private string statusMessage = "Ready";
+    private IJSObjectReference? module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./Components/RecordingStep.razor.js");
+        }
+    }
+
+    private async Task ToggleRecording()
+    {
+        if (!isRecording)
+        {
+            var started = await module!.InvokeAsync<bool>("startRecording");
+            if (started)
+            {
+                isRecording = true;
+                statusMessage = "Recording... speak now";
+            }
+            else
+            {
+                statusMessage = "Microphone permission denied or unavailable.";
+            }
+        }
+        else
+        {
+            await module!.InvokeVoidAsync("stopRecording");
+            isRecording = false;
+            hasRecording = true;
+            statusMessage = "Recording complete.";
+        }
+        StateHasChanged();
+    }
+
+    private async Task Playback()
+    {
+        await module!.InvokeVoidAsync("playbackLastRecording");
+    }
+
+    private void Reset()
+    {
+        hasRecording = false;
+        statusMessage = "Ready to re-record.";
+    }
+
+    [Parameter]
+    public EventCallback OnSubmitted { get; set; }
+
+    private async Task Submit()
+    {
+        await OnSubmitted.InvokeAsync();
+    }
+}
