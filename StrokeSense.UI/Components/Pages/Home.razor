@@ -2,42 +2,109 @@
 @using StrokeSense.Contracts
 @inject IRiskClassifier Classifier
 
-<PageTitle>StrokeSense</PageTitle>
+<PageTitle>StrokeSense – Speech-Based Stroke Risk Indicator</PageTitle>
 
-@if (currentStep == "disclaimer")
-{
-    <DisclaimerGate OnAcknowledged="AcknowledgeDisclaimer" />
-}
-else if (currentStep == "recording")
-{
-    <RecordingStep OnSubmitted="HandleSubmitted" />
-}
-else if (currentStep == "result")
-{
-    <ResultCard Result="result" OnNewTest="ResetToDisclaimer" />
-}
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 mb-8">
+
+    @if (currentStep == "disclaimer")
+    {
+        <!-- Hero -->
+        <MudPaper Elevation="0" Class="pa-8 mb-6"
+                  Style="background: linear-gradient(135deg, #E3F2FD 0%, #FFFFFF 100%); border-radius: 16px;">
+            <MudText Typo="Typo.h3" Color="Color.Primary" GutterBottom Align="Align.Center">
+                StrokeSense
+            </MudText>
+            <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-3" Style="color: #495057;">
+                A quick, browser-based speech check for stroke-related speech patterns
+            </MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Style="color: #6c757d;">
+                Speak into your microphone. Get a risk indicator in seconds.
+            </MudText>
+        </MudPaper>
+
+        <!-- Disclaimer card -->
+        <MudPaper Elevation="3" Class="pa-6 mb-4" Style="border-left: 6px solid #dc3545; border-radius: 12px;">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Size="Size.Large" />
+                <MudText Typo="Typo.h5" Color="Color.Error">Important</MudText>
+            </MudStack>
+
+            <MudText Typo="Typo.body1" Class="mb-3">
+                This tool is <strong>NOT a diagnosis</strong>. It provides a risk indicator only.
+            </MudText>
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-3">
+                If you or someone else has stroke symptoms (Face, Arms, Speech, Time),
+                call <strong>999/112 immediately</strong>.
+            </MudAlert>
+            <MudText Typo="Typo.body2" Style="color: #6c757d;">
+                Your audio is processed in your browser and is <strong>not stored</strong>.
+            </MudText>
+        </MudPaper>
+
+        <!-- What you'll do -->
+        <MudPaper Elevation="2" Class="pa-6 mb-4" Style="border-radius: 12px;">
+            <MudText Typo="Typo.h6" GutterBottom>What you'll do</MudText>
+            <MudList T="string" Dense="true">
+                <MudListItem T="string" Icon="@Icons.Material.Filled.LooksOne">
+                    Record a sustained "ahh" sound (~5 seconds)
+                </MudListItem>
+                <MudListItem T="string" Icon="@Icons.Material.Filled.LooksTwo">
+                    Review your recording (you can re-record)
+                </MudListItem>
+                <MudListItem T="string" Icon="@Icons.Material.Filled.Looks3">
+                    Submit and receive your risk indicator
+                </MudListItem>
+            </MudList>
+        </MudPaper>
+
+        <div class="d-flex justify-center mt-6">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.Mic"
+                       OnClick="AcknowledgeDisclaimer"
+                       Class="px-8 py-3">
+                I understand – continue
+            </MudButton>
+        </div>
+    }
+    else if (currentStep == "recording")
+    {
+        <MudStepper @bind-ActiveStep="_activeStep" Linear="true" Class="mb-4">
+            <MudStep Title="Record">
+                <RecordingStep OnSubmitted="HandleSubmitted" />
+            </MudStep>
+            <MudStep Title="Result">
+                <MudText Typo="Typo.body1">Your result will appear here.</MudText>
+            </MudStep>
+        </MudStepper>
+    }
+    else if (currentStep == "result")
+    {
+        <ResultCard Result="result" OnNewTest="ResetToDisclaimer" />
+    }
+
+</MudContainer>
 
 @code {
     private string currentStep = "disclaimer";
     private RiskResultDto? result;
+    private int _activeStep = 0;
 
-    private void AcknowledgeDisclaimer()
-    {
-        currentStep = "recording";
-    }
+    private void AcknowledgeDisclaimer() => currentStep = "recording";
 
     private async Task HandleSubmitted()
     {
-        // For Sprint 1, call stub classifier with empty stream
-        // In Sprint 4, this will receive the actual audio blob
         using var emptyStream = new MemoryStream();
         result = await Classifier.ClassifyAsync(emptyStream);
         currentStep = "result";
+        _activeStep = 1;
     }
 
     private void ResetToDisclaimer()
     {
         currentStep = "disclaimer";
         result = null;
+        _activeStep = 0;
     }
 }

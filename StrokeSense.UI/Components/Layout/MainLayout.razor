@@ -1,10 +1,20 @@
 ﻿@inherits LayoutComponentBase
+@using StrokeSense.UI.Themes
 
-<MudThemeProvider @rendermode="InteractiveServer" />
+<MudThemeProvider Theme="StrokeSenseTheme.Theme" @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 
 <MudLayout>
+    <MudAppBar Elevation="2" Color="Color.Primary">
+        <MudIcon Icon="@Icons.Material.Filled.HealthAndSafety" Class="mr-3" />
+        <MudText Typo="Typo.h6">StrokeSense</MudText>
+        <MudSpacer />
+        <MudText Typo="Typo.caption" Style="color: rgba(255,255,255,0.85);">
+            Not a diagnosis
+        </MudText>
+    </MudAppBar>
+
     <MudMainContent>
         @Body
     </MudMainContent>

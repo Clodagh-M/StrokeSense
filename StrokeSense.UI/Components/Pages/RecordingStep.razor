@@ -1,26 +1,85 @@
 ﻿@using Microsoft.JSInterop
 @inject IJSRuntime JS
 
-<div class="recording-container">
-    <h2>Step 1: Record Sustained Vowel</h2>
-    <p>Say "ahh" steadily for about 5 seconds.</p>
+<MudPaper Elevation="2" Class="pa-6" Style="border-radius: 12px;">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-4">
+        <MudIcon Icon="@Icons.Material.Filled.Mic" Color="Color.Primary" Size="Size.Large" />
+        <MudText Typo="Typo.h5">Step 1: Record Sustained Vowel</MudText>
+    </MudStack>
 
-    <button class="btn-primary" @onclick="ToggleRecording">
-        @(isRecording ? "Stop Recording" : "Start Recording")
-    </button>
+    <MudText Typo="Typo.body1" Class="mb-4">
+        Say <strong>"ahh"</strong> steadily for about 5 seconds.
+        Keep your device about 20 cm from your mouth.
+    </MudText>
 
-    @if (hasRecording)
+    <div class="d-flex justify-center mb-4">
+        <MudButton Variant="Variant.Filled"
+                   Color="@(isRecording ? Color.Error : Color.Primary)"
+                   Size="Size.Large"
+                   StartIcon="@(isRecording ? Icons.Material.Filled.Stop : Icons.Material.Filled.Mic)"
+                   OnClick="ToggleRecording"
+                   Class="px-8 py-3">
+            @(isRecording ? "Stop Recording" : "Start Recording")
+        </MudButton>
+    </div>
+
+    @if (isRecording)
     {
-        <div class="playback-section">
-            <p>Recording captured.</p>
-            <button class="btn-secondary" @onclick="Playback">Playback</button>
-            <button class="btn-secondary" @onclick="Reset">Re-record</button>
-            <button class="btn-primary" @onclick="Submit">Submit for Analysis</button>
-        </div>
+        <MudAlert Severity="Severity.Info" NoIcon Variant="Variant.Outlined" Class="mb-4">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Error" />
+                <MudText Typo="Typo.body2">Recording... speak now</MudText>
+            </MudStack>
+        </MudAlert>
     }
 
-    <p class="status">@statusMessage</p>
-</div>
+    @if (hasRecording && !isRecording)
+    {
+        <MudPaper Elevation="0" Class="pa-4 mb-4" Style="background-color: #f8f9fa; border-radius: 8px;">
+            <MudText Typo="Typo.body1" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                Recording captured.
+            </MudText>
+            <MudStack Row="true" Spacing="2">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.PlayArrow"
+                           OnClick="Playback">
+                    Playback
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Warning"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="Reset">
+                    Re-record
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Send"
+                           OnClick="Submit"
+                           Class="ml-auto">
+                    Submit for Analysis
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+
+    @if (!string.IsNullOrEmpty(statusMessage) && !isRecording && !hasRecording)
+    {
+        <MudText Typo="Typo.body2" Align="Align.Center" Style="color: #6c757d;">
+            @statusMessage
+        </MudText>
+    }
+
+    @if (statusMessage == "Microphone permission denied or unavailable.")
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mt-4">
+            Microphone permission was denied. Please check your browser settings
+            (click the lock icon in the address bar) and allow microphone access,
+            then try again.
+        </MudAlert>
+    }
+</MudPaper>
 
 @code {
     private bool isRecording = false;
@@ -33,7 +92,7 @@
         if (firstRender)
         {
             module = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "./js/RecordingStep.js");
+                "import", "./js/recordingstep.js");
         }
     }
 

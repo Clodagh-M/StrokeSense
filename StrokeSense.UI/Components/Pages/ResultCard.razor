@@ -1,63 +1,94 @@
 ﻿@using StrokeSense.Contracts
 
-<div class="result-container">
-    <h2>Your Result</h2>
+<MudPaper Elevation="3" Class="pa-6" Style="border-radius: 12px;">
 
-    <div class="risk-indicator @RiskLabelClass">
-        <span class="risk-icon">@RiskIcon</span>
-        <span class="risk-label">@RiskLabel.ToUpper() RISK INDICATOR</span>
-    </div>
+    <MudText Typo="Typo.h4" GutterBottom Align="Align.Center">Your Result</MudText>
 
-    <p class="risk-description">
+    <MudPaper Elevation="0"
+              Class="pa-6 mb-4 d-flex align-center"
+              Style="@($"border-radius: 12px; background-color: {BackgroundColor}; border: 2px solid {BorderColor};")">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+            <MudIcon Icon="@RiskIcon" Size="Size.Large" Style="@($"color: {BorderColor};")" />
+            <MudText Typo="Typo.h5" Style="@($"color: {BorderColor}; font-weight: bold;")">
+                @RiskLabel.ToUpper() RISK INDICATOR
+            </MudText>
+        </MudStack>
+    </MudPaper>
+
+    <MudText Typo="Typo.body1" Class="mb-4">
         @if (RiskLabel == "elevated")
         {
-            <text>
-                Your speech sample shows patterns that may warrant medical attention.
-                <strong>If you have any stroke symptoms, call 999/112 immediately.</strong>
-            </text>
+            <text>Your speech sample shows patterns that may warrant medical attention.</text>
         }
         else
         {
-            <text>
-                Your speech sample does not show strong patterns associated with
-                stroke-related speech changes.
-            </text>
+            <text>Your speech sample does not show strong patterns associated with stroke-related speech changes.</text>
         }
-    </p>
+    </MudText>
 
-    <p class="confidence">
-        Confidence: @ConfidenceText
-    </p>
+    @if (RiskLabel == "elevated")
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-4">
+            <MudText Typo="Typo.body1" Class="mb-2">
+                <strong>If you have any stroke symptoms, call 999/112 immediately.</strong>
+            </MudText>
+            <MudText Typo="Typo.body2">
+                FAST: Face drooping · Arm weakness · Speech difficulty · Time to call emergency services
+            </MudText>
+        </MudAlert>
+    }
 
-    <p class="disclaimer-small">
-        This is not a diagnosis.
-    </p>
+    <MudDivider Class="my-4" />
 
-    <button class="btn-primary" @onclick="StartNewTest">Start a new test</button>
-</div>
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+        <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" Color="Color.Secondary" />
+        <MudText Typo="Typo.body2">
+            Confidence: <strong>@ConfidenceText</strong>
+        </MudText>
+    </MudStack>
+
+    <MudText Typo="Typo.caption" Style="color: #6c757d;">
+        This is not a diagnosis. If you are worried, speak to your GP.
+    </MudText>
+
+    <div class="d-flex justify-center mt-6">
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="StartNewTest"
+                   Class="px-8 py-3">
+            Start a new test
+        </MudButton>
+    </div>
+</MudPaper>
 
 @code {
-    [Parameter]
-    public RiskResultDto? Result { get; set; }
-
-    [Parameter]
-    public EventCallback OnNewTest { get; set; }
+    [Parameter] public RiskResultDto? Result { get; set; }
+    [Parameter] public EventCallback OnNewTest { get; set; }
 
     private string RiskLabel => Result?.Label ?? "low";
     private double Confidence => Result?.Confidence ?? 0;
 
-    private string RiskLabelClass => RiskLabel switch
+    private string BackgroundColor => RiskLabel switch
     {
-        "elevated" => "risk-elevated",
-        "moderate" => "risk-moderate",
-        _ => "risk-low"
+        "elevated" => "#f8d7da",
+        "moderate" => "#fff3cd",
+        _ => "#d1e7dd"
+    };
+
+    private string BorderColor => RiskLabel switch
+    {
+        "elevated" => "#842029",
+        "moderate" => "#664d03",
+        _ => "#0f5132"
     };
 
     private string RiskIcon => RiskLabel switch
     {
-        "elevated" => "▲",
-        "moderate" => "●",
-        _ => "●"
+        "elevated" => Icons.Material.Filled.Warning,
+        "moderate" => Icons.Material.Filled.Info,
+        _ => Icons.Material.Filled.CheckCircle
     };
 
     private string ConfidenceText => Confidence switch
@@ -67,8 +98,5 @@
         _ => "Low"
     };
 
-    private async Task StartNewTest()
-    {
-        await OnNewTest.InvokeAsync();
-    }
+    private async Task StartNewTest() => await OnNewTest.InvokeAsync();
 }
